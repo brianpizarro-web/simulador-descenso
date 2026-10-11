@@ -61,12 +61,19 @@
         /* Colores de Tabla */
         .fila.par.salvado .team-pos { background-color: #a0a0a0; }
         .fila.par.salvado .team-name, .fila.par.salvado .team-pts { background-color: #e0e0e0; color: #222; }
+        
         .fila.impar.salvado .team-pos { background-color: #b3b3b3; }
         .fila.impar.salvado .team-name, .fila.impar.salvado .team-pts { background-color: #ececec; color: #222; }
+        
         .fila.desempate .team-pos { background-color: #c99300; }
         .fila.desempate .team-name, .fila.desempate .team-pts { background-color: #ffc107; color: #000; }
-        .fila.descendido .team-pos { background-color: #d32f2f; }
-        .fila.descendido .team-name, .fila.descendido .team-pts { background-color: #ff7f7f; color: #000; }
+        
+        /* Bifurcación del Descenso */
+        .fila.descendido-claro .team-pos { background-color: #d32f2f; }
+        .fila.descendido-claro .team-name, .fila.descendido-claro .team-pts { background-color: #ff7f7f; color: #000; }
+        
+        .fila.descendido-oscuro .team-pos { background-color: #b71c1c; }
+        .fila.descendido-oscuro .team-name, .fila.descendido-oscuro .team-pts { background-color: #e53935; color: #fff; }
 
         /* Ventana Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
@@ -283,10 +290,15 @@
                 let peorPosicion = 7 - teamsBelow; 
                 let mejorPosicion = 8 - (teamsBelow + samePts);
                 
-                if (mejorPosicion <= 5 && peorPosicion >= 6) {
+                // Algoritmo corregido: detecta si un empate abarca la línea de fuego de los puestos 17 y 18
+                let isTiebreaker = (mejorPosicion <= 6 && peorPosicion >= 6 && samePts > 1);
+                
+                if (isTiebreaker) {
                     team.class = "desempate";
-                } else if (mejorPosicion >= 6) {
-                    team.class = "descendido";
+                } else if (peorPosicion === 7) {
+                    team.class = "descendido-oscuro";
+                } else if (peorPosicion === 6) {
+                    team.class = "descendido-claro";
                 } else {
                     team.class = "salvado";
                 }
