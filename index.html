@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador Descenso Primera Nacional</title>
     <style>
-        /* Transición a Light Mode profesional */
         body { font-family: 'Roboto', system-ui, sans-serif; background-color: #f0f2f5; color: #333; padding: 20px; max-width: 900px; margin: auto; }
         h1 { text-align: center; font-size: 1.5rem; margin-bottom: 30px; color: #111; }
         
@@ -15,7 +14,6 @@
         
         .panel-tabla { position: sticky; top: 20px; align-self: flex-start; padding: 0; background: transparent; box-shadow: none; }
 
-        /* Acordeones limpios */
         .fecha-grupo { margin-bottom: 10px; }
         .accordion-btn {
             background-color: #fff;
@@ -46,7 +44,6 @@
         }
         .accordion-content.active { display: block; }
         
-        /* Botonera de interacción */
         .match { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
         .match:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .match-info { font-size: 0.95rem; text-align: center; display: flex; justify-content: space-between; padding: 0 5px; }
@@ -59,15 +56,16 @@
         .btn:hover { background: #e4e4e4; }
         .btn.active { background: #000; color: white; border-color: #000; }
 
-        /* Arquitectura Visual de Tabla Estilo Bloque */
-        .tbody { position: relative; height: 315px; } /* 7 filas * 45px altura */
+        /* ARQUITECTURA CORREGIDA: CSS GRID */
+        .tbody { position: relative; height: 336px; width: 100%; } /* 7 filas * 48px */
         .fila { 
-            position: absolute; left: 0; width: 100%; height: 45px; 
-            display: flex; align-items: stretch;
+            position: absolute; left: 0; right: 0; height: 48px; 
+            display: grid; grid-template-columns: 40px 35px 1fr 50px; /* Columnas estrictas */
             transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
+            width: 100%;
         }
         
-        /* Celdas con bordes blancos de separación */
+        /* Formato de celdas internas */
         .fila > div {
             display: flex; align-items: center; justify-content: center;
             border-right: 2px solid #fff;
@@ -76,23 +74,36 @@
         }
         .fila > div:last-child { border-right: none; }
         
-        .team-pos { width: 45px; font-weight: bold; color: white; font-size: 1rem; }
-        .team-check { width: 35px; background-color: #ff5252; color: white; font-size: 0.9rem; }
-        .team-name { flex: 1; justify-content: flex-start; padding-left: 12px; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: -0.5px; }
-        .team-pts { width: 60px; font-weight: 800; font-size: 1.1rem; }
+        .team-pos { font-weight: bold; color: white; font-size: 1rem; }
+        .team-check { background-color: #ff5252; color: white; font-size: 0.9rem; }
+        
+        /* Truncado de texto obligatorio para evitar que se rompa la altura */
+        .team-name { 
+            display: block !important; /* Forza el bloque para truncar texto */
+            line-height: 46px; 
+            padding-left: 12px;
+            text-align: left;
+            font-weight: 800; 
+            font-size: 0.95rem; 
+            text-transform: uppercase; 
+            letter-spacing: -0.5px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis;
+        }
+        
+        .team-pts { font-weight: 800; font-size: 1.1rem; }
 
-        /* Zebra Striping Dinámico para Zona Segura */
+        /* Zebra Striping y Colores */
         .fila.par.salvado .team-pos { background-color: #a0a0a0; }
         .fila.par.salvado .team-name, .fila.par.salvado .team-pts { background-color: #e0e0e0; color: #222; }
         
         .fila.impar.salvado .team-pos { background-color: #b3b3b3; }
         .fila.impar.salvado .team-name, .fila.impar.salvado .team-pts { background-color: #ececec; color: #222; }
 
-        /* Colorización Zona Desempate */
         .fila.desempate .team-pos { background-color: #c99300; }
         .fila.desempate .team-name, .fila.desempate .team-pts { background-color: #ffc107; color: #000; }
         
-        /* Colorización Zona Descenso Directo */
         .fila.descendido .team-pos { background-color: #d32f2f; }
         .fila.descendido .team-name, .fila.descendido .team-pts { background-color: #ff7f7f; color: #000; }
 
@@ -146,7 +157,6 @@
             Object.keys(basePts).forEach(team => {
                 const fila = document.createElement("div");
                 fila.id = "row-" + team.replace(/\s+/g, '-');
-                // Bloques idénticos al de la imagen
                 fila.innerHTML = `
                     <div class="team-pos"></div>
                     <div class="team-check">✓</div>
@@ -249,23 +259,19 @@
                 const rowId = "row-" + team.name.replace(/\s+/g, '-');
                 const rowElement = document.getElementById(rowId);
                 
-                rowElement.style.transform = `translateY(${index * 45}px)`;
+                rowElement.style.transform = `translateY(${index * 48}px)`;
                 
-                // Formato numérico idéntico a la imagen (ej: "12.")
                 rowElement.querySelector('.team-pos').innerText = (index + 12) + ".";
                 rowElement.querySelector('.team-pts').innerText = team.pts;
                 
-                // Reset de clases para recalcular el zebra striping
                 rowElement.className = 'fila';
                 
-                // Asignación matemática de par/impar para mantener el patrón al reordenar
                 if (index % 2 === 0) {
                     rowElement.classList.add('par');
                 } else {
                     rowElement.classList.add('impar');
                 }
                 
-                // Aplicación del color final de la fila
                 rowElement.classList.add(team.class);
             });
         }
