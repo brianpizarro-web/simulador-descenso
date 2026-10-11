@@ -184,11 +184,10 @@
                 
                 const btn = document.createElement("button");
                 btn.className = "accordion-btn";
-                btn.innerHTML = `${fecha} <span>${index === 0 ? '▲' : '▼'}</span>`;
+                btn.innerHTML = `${fecha} <span>▼</span>`;
                 
                 const content = document.createElement("div");
                 content.className = "accordion-content";
-                if (index === 0) content.classList.add("active");
                 
                 btn.onclick = function() {
                     const isActive = content.classList.contains("active");
@@ -294,6 +293,7 @@
     </script>
 </body>
 </html>
+
 
 
 
