@@ -12,9 +12,9 @@
         h1 { font-size: 1.6rem; color: #111; margin-bottom: 10px; text-transform: uppercase; letter-spacing: -0.5px; }
         
         .tutorial-bar { background-color: #e9ecef; border-left: 4px solid #111; padding: 12px 15px; font-size: 0.9rem; color: #444; margin-bottom: 20px; border-radius: 4px; text-align: left; display: flex; align-items: center; justify-content: space-between; }
-        .tutorial-text { flex: 1; }
+        .tutorial-text { flex: 1; padding-right: 15px; line-height: 1.4; }
         
-        .btn-info { background-color: #111; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .btn-info { background-color: #111; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
         .btn-info:hover { background-color: #333; }
 
         /* Contenedores Principales */
@@ -90,7 +90,7 @@
 
     <div class="tutorial-bar">
         <div class="tutorial-text">
-            <strong>Cómo usar:</strong> Seleccioná un resultado para proyectar la tabla. Volvé a tocar una opción activa para deshacer tu decisión y dejar el partido en blanco.
+            <strong>Instrucciones:</strong> Seleccioná las fechas y elegí el resultado del partido (gana el local, empate o gana el visitante). A medida que se seleccione un resultado, la tabla se irá actualizando en tiempo real.
         </div>
         <button class="btn-info" onclick="toggleModal()">
             ℹ️ Sobre este proyecto
@@ -112,12 +112,12 @@
         <div class="modal-content">
             <button class="modal-close" onclick="toggleModal()">×</button>
             <div class="modal-body">
-                <h2>El rigor reglamentario (Punto 5)</h2>
-                <p>Esta herramienta fue desarrollada para eliminar las especulaciones matemáticas inexactas en la definición de la zona de descenso de la Primera Nacional.</p>
-                <p>A diferencia de otras competiciones, el reglamento oficial de la AFA establece explícitamente que <strong>la pérdida de categoría no se define por diferencia de gol</strong>. Si dos o más equipos igualan en puntos en posiciones de riesgo (puestos 17 y 18), están obligados a jugar un partido de desempate en cancha neutral.</p>
-                <p>El motor lógico de esta tabla anula por completo la diferencia de gol y aplica el rigor de esa regla en tiempo real, agrupando a los equipos empatados bajo el estado de "Desempate" (color mostaza) sin importar los goles a favor o en contra que posean.</p>
+                <h2>Razón del Proyecto</h2>
+                <p>Este simulador nace como un proyecto que busca analizar y facilitar los cálculos necesarios para determinar que clubes descendenderán de la Primera Nacional. Este modelo está desarrollado por un hincha de Chacarita Juniors, por lo que solamente se tomó la Zona B como objeto de interés.</p>
+                <p>Vale aclarar que, a diferencia de otras competiciones, el reglamento oficial de la AFA establece explícitamente que la pérdida de categoría no se define por diferencia de gol. En caso de que dos o más equipos igualen en puntos en posiciones que decreten un descenso (puestos 17 y 18), estos están obligados a jugar un partido de desempate en cancha neutral (se recomienda la lectura del punto 5 del Reglamento adjuntado aquí abajo).</p>
+                <p>Por ese motivo, el motor lógico de esta tabla anula por completo la diferencia de gol y aplica el rigor de esa regla en tiempo real. Los equipos que empaten en puntos serán agrupados bajo el estado de "Desempate" (color amarillo) sin importar los goles a favor o en contra que posean.</p>
                 
-                <a href="https://tu-link-de-afa-aqui.com/reglamento.pdf" target="_blank" class="btn-download">📄 Ver PDF del Reglamento Oficial</a>
+                <a href="https://assets1.afa.com.ar/2026/Lau/Boletin-Especial-6823---Reglamento-del-Campeonato-de-Primera-Nacional-2026.pdf" target="_blank" class="btn-download">📄 Ver PDF del Reglamento Oficial</a>
             </div>
         </div>
     </div>
