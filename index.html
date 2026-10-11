@@ -12,7 +12,6 @@
         .panel { flex: 1; min-width: 320px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #444; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
         
-        /* Contenedor expandido forzosamente para evitar el colapso del ancho */
         .panel-tabla { flex: 1; min-width: 320px; position: sticky; top: 20px; align-self: flex-start; padding: 0; background: transparent; box-shadow: none; }
 
         .fecha-grupo { margin-bottom: 10px; }
@@ -57,7 +56,6 @@
         .btn:hover { background: #e4e4e4; }
         .btn.active { background: #000; color: white; border-color: #000; }
 
-        /* ARQUITECTURA REDUCIDA A 3 COLUMNAS */
         .tbody { position: relative; height: 336px; width: 100%; } 
         .fila { 
             position: absolute; left: 0; right: 0; height: 48px; 
@@ -153,7 +151,6 @@
             Object.keys(basePts).forEach(team => {
                 const fila = document.createElement("div");
                 fila.id = "row-" + team.replace(/\s+/g, '-');
-                // Se eliminó la etiqueta del tick (team-check)
                 fila.innerHTML = `
                     <div class="team-pos"></div>
                     <div class="team-name">${team}</div>
@@ -212,10 +209,19 @@
         }
 
         function update(id, val) {
-            results[id] = val;
             const matchRow = document.querySelector(`.match[data-id='${id}']`);
-            matchRow.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
-            matchRow.querySelector(`.btn[data-val='${val}']`).classList.add('active');
+            
+            // Lógica de toggle: si hace clic en el mismo que ya está activo, se desmarca
+            if (results[id] === val) {
+                results[id] = "pend";
+                matchRow.querySelector(`.btn[data-val='${val}']`).classList.remove('active');
+            } else {
+                // Si selecciona un resultado diferente, cambia la predicción
+                results[id] = val;
+                matchRow.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+                matchRow.querySelector(`.btn[data-val='${val}']`).classList.add('active');
+            }
+            
             calculate();
         }
 
