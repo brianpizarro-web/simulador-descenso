@@ -6,42 +6,28 @@
     <title>Simulador Primera Nacional</title>
     <style>
         body { font-family: 'Roboto', system-ui, sans-serif; background-color: #f0f2f5; color: #333; padding: 20px; max-width: 900px; margin: auto; }
-        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 30px; color: #111; }
         
+        /* Cabecera y Tutorial */
+        .header-container { text-align: center; margin-bottom: 25px; }
+        h1 { font-size: 1.6rem; color: #111; margin-bottom: 10px; text-transform: uppercase; letter-spacing: -0.5px; }
+        
+        .tutorial-bar { background-color: #e9ecef; border-left: 4px solid #111; padding: 12px 15px; font-size: 0.9rem; color: #444; margin-bottom: 20px; border-radius: 4px; text-align: left; display: flex; align-items: center; justify-content: space-between; }
+        .tutorial-text { flex: 1; }
+        
+        .btn-info { background-color: #111; color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: bold; cursor: pointer; transition: background 0.2s; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .btn-info:hover { background-color: #333; }
+
+        /* Contenedores Principales */
         .container { display: flex; flex-wrap: wrap; gap: 30px; position: relative; }
         .panel { flex: 1; min-width: 320px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #444; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
-        
         .panel-tabla { flex: 1; min-width: 320px; position: sticky; top: 20px; align-self: flex-start; padding: 0; background: transparent; box-shadow: none; }
 
+        /* Acordeones y Botonera */
         .fecha-grupo { margin-bottom: 10px; }
-        .accordion-btn {
-            background-color: #fff;
-            color: #333;
-            cursor: pointer;
-            padding: 12px 15px;
-            width: 100%;
-            border: 1px solid #ddd;
-            text-align: left;
-            outline: none;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.2s;
-        }
+        .accordion-btn { background-color: #fff; color: #333; cursor: pointer; padding: 12px 15px; width: 100%; border: 1px solid #ddd; text-align: left; outline: none; font-size: 1rem; font-weight: bold; border-radius: 4px; display: flex; justify-content: space-between; align-items: center; transition: background-color 0.2s; }
         .accordion-btn:hover { background-color: #f9f9f9; }
-        .accordion-content {
-            padding: 10px;
-            display: none; 
-            background-color: #fff;
-            border: 1px solid #ddd;
-            border-top: none;
-            border-radius: 0 0 4px 4px;
-            margin-bottom: 10px;
-        }
+        .accordion-content { padding: 10px; display: none; background-color: #fff; border: 1px solid #ddd; border-top: none; border-radius: 0 0 4px 4px; margin-bottom: 10px; }
         .accordion-content.active { display: block; }
         
         .match { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
@@ -56,57 +42,58 @@
         .btn:hover { background: #e4e4e4; }
         .btn.active { background: #000; color: white; border-color: #000; }
 
+        /* Estructura de Tabla */
         .tbody { position: relative; height: 336px; width: 100%; } 
-        .fila { 
-            position: absolute; left: 0; right: 0; height: 48px; 
-            display: grid; grid-template-columns: 45px 1fr 50px; 
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
-            width: 100%;
-        }
-        
-        .fila > div {
-            display: flex; align-items: center; justify-content: center;
-            border-right: 2px solid #fff;
-            border-bottom: 2px solid #fff;
-            box-sizing: border-box;
-        }
+        .fila { position: absolute; left: 0; right: 0; height: 48px; display: grid; grid-template-columns: 45px 1fr 50px; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
+        .fila > div { display: flex; align-items: center; justify-content: center; border-right: 2px solid #fff; border-bottom: 2px solid #fff; box-sizing: border-box; }
         .fila > div:last-child { border-right: none; }
         
         .team-pos { font-weight: bold; color: white; font-size: 1rem; }
-        
-        .team-name { 
-            display: block !important; 
-            line-height: 46px; 
-            padding-left: 12px;
-            text-align: left;
-            font-weight: 800; 
-            font-size: 0.95rem; 
-            text-transform: uppercase; 
-            letter-spacing: -0.5px; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis;
-        }
-        
+        .team-name { display: block !important; line-height: 46px; padding-left: 12px; text-align: left; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: -0.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .team-pts { font-weight: 800; font-size: 1.1rem; }
 
+        /* Colores de Tabla */
         .fila.par.salvado .team-pos { background-color: #a0a0a0; }
         .fila.par.salvado .team-name, .fila.par.salvado .team-pts { background-color: #e0e0e0; color: #222; }
-        
         .fila.impar.salvado .team-pos { background-color: #b3b3b3; }
         .fila.impar.salvado .team-name, .fila.impar.salvado .team-pts { background-color: #ececec; color: #222; }
-
         .fila.desempate .team-pos { background-color: #c99300; }
         .fila.desempate .team-name, .fila.desempate .team-pts { background-color: #ffc107; color: #000; }
-        
         .fila.descendido .team-pos { background-color: #d32f2f; }
         .fila.descendido .team-name, .fila.descendido .team-pts { background-color: #ff7f7f; color: #000; }
+
+        /* Ventana Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(3px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .modal-overlay.show { opacity: 1; pointer-events: all; }
+        
+        .modal-content { background: white; width: 90%; max-width: 600px; border-radius: 8px; padding: 30px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transform: translateY(20px); transition: transform 0.3s; }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        
+        .modal-close { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #666; }
+        .modal-close:hover { color: #000; }
+        
+        .modal-body h2 { margin-top: 0; font-size: 1.4rem; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; }
+        .modal-body p { line-height: 1.6; color: #444; margin-bottom: 15px; }
+        
+        .btn-download { display: inline-block; background-color: #d32f2f; color: white; text-decoration: none; padding: 12px 20px; border-radius: 4px; font-weight: bold; text-align: center; margin-top: 10px; width: 100%; box-sizing: border-box; transition: background 0.2s; }
+        .btn-download:hover { background-color: #b71c1c; }
 
     </style>
 </head>
 <body>
 
-    <h1>Simulador Primera Nacional</h1>
+    <div class="header-container">
+        <h1>Simulador Primera Nacional</h1>
+    </div>
+
+    <div class="tutorial-bar">
+        <div class="tutorial-text">
+            <strong>Cómo usar:</strong> Seleccioná un resultado para proyectar la tabla. Volvé a tocar una opción activa para deshacer tu decisión y dejar el partido en blanco.
+        </div>
+        <button class="btn-info" onclick="toggleModal()">
+            ℹ️ Sobre este proyecto
+        </button>
+    </div>
     
     <div class="container">
         <div class="panel" id="fixture-container">
@@ -119,7 +106,36 @@
         </div>
     </div>
 
+    <!-- Ventana Modal Oculta -->
+    <div class="modal-overlay" id="infoModal" onclick="closeModalOutside(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="toggleModal()">×</button>
+            <div class="modal-body">
+                <h2>El rigor reglamentario (Punto 5)</h2>
+                <p>Esta herramienta fue desarrollada para eliminar las especulaciones matemáticas inexactas en la definición de la zona de descenso de la Primera Nacional.</p>
+                <p>A diferencia de otras competiciones, el reglamento oficial de la AFA establece explícitamente que <strong>la pérdida de categoría no se define por diferencia de gol</strong>. Si dos o más equipos igualan en puntos en posiciones de riesgo (puestos 17 y 18), están obligados a jugar un partido de desempate en cancha neutral.</p>
+                <p>El motor lógico de esta tabla anula por completo la diferencia de gol y aplica el rigor de esa regla en tiempo real, agrupando a los equipos empatados bajo el estado de "Desempate" (color mostaza) sin importar los goles a favor o en contra que posean.</p>
+                
+                <!-- Enlace al PDF. El archivo debe llamarse reglamento.pdf y estar en la misma carpeta -->
+                <a href="reglamento.pdf" target="_blank" class="btn-download">📄 Ver PDF del Reglamento Oficial</a>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Lógica de la Ventana Modal
+        function toggleModal() {
+            const modal = document.getElementById('infoModal');
+            modal.classList.toggle('show');
+        }
+
+        function closeModalOutside(event) {
+            const modal = document.getElementById('infoModal');
+            if (event.target === modal) {
+                modal.classList.remove('show');
+            }
+        }
+
         const basePts = { "Almagro": 41, "Agropecuario": 40, "Quilmes": 39, "Nueva Chicago": 36, "Patronato": 34, "Chacarita": 33, "Güemes": 23 };
         
         const matches = [
@@ -210,18 +226,14 @@
 
         function update(id, val) {
             const matchRow = document.querySelector(`.match[data-id='${id}']`);
-            
-            // Lógica de toggle: si hace clic en el mismo que ya está activo, se desmarca
             if (results[id] === val) {
                 results[id] = "pend";
                 matchRow.querySelector(`.btn[data-val='${val}']`).classList.remove('active');
             } else {
-                // Si selecciona un resultado diferente, cambia la predicción
                 results[id] = val;
                 matchRow.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
                 matchRow.querySelector(`.btn[data-val='${val}']`).classList.add('active');
             }
-            
             calculate();
         }
 
