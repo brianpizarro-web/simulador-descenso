@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador Descenso Primera Nacional</title>
+    <style>
+        body { font-family: system-ui, sans-serif; background-color: #121212; color: #ffffff; padding: 20px; max-width: 900px; margin: auto; }
+        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 30px; }
+        
+        .container { display: flex; flex-wrap: wrap; gap: 30px; }
+        .panel { flex: 1; min-width: 320px; background: #1e1e1e; padding: 20px; border-radius: 8px; }
+        h3 { margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; color: #aaa; }
+        
+        /* Sistema Fecha por Fecha */
+        .fecha-grupo { margin-bottom: 25px; }
+        .fecha-titulo { font-weight: bold; color: #fff; background: #2a2a2a; padding: 5px 10px; border-radius: 4px; margin-bottom: 10px; display: inline-block; font-size: 0.85rem; }
+        
+        /* Botonera un clic */
+        .match { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 8px 0; border-bottom: 1px solid #2a2a2a; }
+        .match-info { font-size: 0.9rem; flex: 1; }
+        .btn-group { display: flex; gap: 5px; }
+        .btn { background: #333; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; min-width: 40px; }
+        .btn:hover { background: #444; }
+        .btn.active { background: #007bff; color: white; }
+
+        /* Tabla Animada (Coordenadas Absolutas) */
+        .tabla-header { display: grid; grid-template-columns: 2fr 1fr 2fr; padding: 10px; border-bottom: 1px solid #555; font-weight: bold; font-size: 0.9rem; color: #aaa; }
+        .tbody { position: relative; height: 350px; /* 7 filas * 50px */ margin-top: 10px; }
+        .fila { position: absolute; left: 0; width: 100%; height: 50px; display: grid; grid-template-columns: 2fr 1fr 2fr; align-items: center; padding: 0 10px; box-sizing: border-box; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s; border-bottom: 1px solid #2a2a2a; }
+        
+        /* Estados del reglamento */
+        .salvado { color: #4CAF50; font-weight: bold; }
+        .desempate { color: #FFC107; font-weight: bold; }
+        .descendido { color: #F44336; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>Simulador: Zona de Descenso</h1>
+    
+    <div class="container">
+        <div class="panel" id="fixture-container">
+            <h3>Fixture Restante</h3>
+            <!-- Partidos agrupados por fecha generados por JS -->
+        </div>
+
+        <div class="panel">
+            <h3>Tabla de Posiciones</h3>
+            <div class="tabla-header">
+                <div>Equipo</div>
+                <div>Pts</div>
+                <div>Estado</div>
+            </div>
+            <div class="tbody" id="tabla-body">
+                <!-- Filas creadas dinámicamente para animación -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const basePts = { "Almagro": 41, "Agropecuario": 40, "Quilmes": 39, "Nueva Chicago": 36, "Patronato": 34, "Chacarita": 33, "Güemes": 23 };
+        
+        const matches = [
+            { id: 1, l: "Güemes", v: "Patronato", f: "Fecha 33" },
+            { id: 2, l: "Nueva Chicago", v: "Externo", f: "Fecha 33" },
+            { id: 3, l: "Almagro", v: "Güemes", f: "Fecha 34" },
+            { id: 4, l: "Chacarita", v: "Externo", f: "Fecha 34" },
+            { id: 5, l: "Patronato", v: "Externo", f: "Fecha 34" },
+            { id: 6, l: "Nueva Chicago", v: "Externo", f: "Fecha 34" },
+            { id: 7, l: "Quilmes", v: "Externo", f: "Fecha 34" },
+            { id: 8, l: "Agropecuario", v: "Externo", f: "Fecha 34" },
+            { id: 9, l: "Güemes", v: "Externo", f: "Fecha 35" },
+            { id: 10, l: "Chacarita", v: "Externo", f: "Fecha 35" },
+            { id: 11, l: "Patronato", v: "Agropecuario", f: "Fecha 35" },
+            { id: 12, l: "Nueva Chicago", v: "Externo", f: "Fecha 35" },
+            { id: 13, l: "Quilmes", v: "Externo", f: "Fecha 35" },
+            { id: 14, l: "Almagro", v: "Externo", f: "Fecha 35" },
+            { id: 15, l: "Güemes", v: "Externo", f: "Fecha 36" },
+            { id: 16, l: "Chacarita", v: "Nueva Chicago", f: "Fecha 36" },
+            { id: 17, l: "Patronato", v: "Externo", f: "Fecha 36" },
+            { id: 18, l: "Quilmes", v: "Externo", f: "Fecha 36" },
+            { id: 19, l: "Almagro", v: "Agropecuario", f: "Fecha 36" }
+        ];
+
+        let results = {};
+
+        function init() {
+            // Inicializar base de datos local y tabla DOM
+            const tbody = document.getElementById("tabla-body");
+            Object.keys(basePts).forEach(team => {
+                const fila = document.createElement("div");
+                fila.className = "fila";
+                fila.id = "row-" + team.replace(/\s+/g, '-');
+                fila.innerHTML = `
+                    <div class="team-name">${team}</div>
+                    <div class="team-pts"><b>${basePts[team]}</b></div>
+                    <div class="team-status"></div>
+                `;
+                tbody.appendChild(fila);
+            });
+
+            // Agrupar fixture por fecha
+            const container = document.getElementById("fixture-container");
+            const fechas = [...new Set(matches.map(m => m.f))];
+            
+            fechas.forEach(fecha => {
+                const grupo = document.createElement("div");
+                grupo.className = "fecha-grupo";
+                grupo.innerHTML = `<div class="fecha-titulo">${fecha}</div>`;
+                
+                matches.filter(m => m.f === fecha).forEach(m => {
+                    results[m.id] = "pend";
+                    const matchDiv = document.createElement("div");
+                    matchDiv.className = "match";
+                    matchDiv.dataset.id = m.id;
+                    matchDiv.innerHTML = `
+                        <div class="match-info">${m.l} vs ${m.v}</div>
+                        <div class="btn-group">
+                            <button class="btn" data-val="L" onclick="update(${m.id}, 'L')">L</button>
+                            <button class="btn" data-val="E" onclick="update(${m.id}, 'E')">E</button>
+                            <button class="btn" data-val="V" onclick="update(${m.id}, 'V')">V</button>
+                        </div>
+                    `;
+                    grupo.appendChild(matchDiv);
+                });
+                container.appendChild(grupo);
+            });
+
+            calculate();
+        }
+
+        function update(id, val) {
+            results[id] = val;
+            
+            // Lógica de interfaz: actualizar estado activo del botón
+            const matchRow = document.querySelector(`.match[data-id='${id}']`);
+            matchRow.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+            matchRow.querySelector(`.btn[data-val='${val}']`).classList.add('active');
+            
+            calculate();
+        }
+
+        function calculate() {
+            let currentPts = { ...basePts };
+
+            // Cálculo matemático de los cruces
+            matches.forEach(m => {
+                const res = results[m.id];
+                if (res === "L") {
+                    if(currentPts[m.l] !== undefined) currentPts[m.l] += 3;
+                } else if (res === "E") {
+                    if(currentPts[m.l] !== undefined) currentPts[m.l] += 1;
+                    if(currentPts[m.v] !== undefined) currentPts[m.v] += 1;
+                } else if (res === "V") {
+                    if(currentPts[m.v] !== undefined) currentPts[m.v] += 3;
+                }
+            });
+
+            // Generar matriz de posiciones temporales
+            let table = Object.keys(currentPts).map(k => ({ name: k, pts: currentPts[k] }));
+            table.sort((a, b) => b.pts - a.pts);
+
+            // Algoritmo de desempate ternario
+            table.forEach((team, index) => {
+                let samePts = table.filter(t => t.pts === team.pts).length;
+                let teamsBelow = table.filter(t => t.pts < team.pts).length;
+                
+                let peorPosicion = 7 - teamsBelow; 
+                let mejorPosicion = 8 - (teamsBelow + samePts);
+                
+                if (mejorPosicion <= 5 && peorPosicion >= 6) {
+                    team.status = "Desempate";
+                    team.class = "desempate";
+                } else if (mejorPosicion >= 6) {
+                    team.status = "Descenso Directo";
+                    team.class = "descendido";
+                } else {
+                    team.status = "Salvado";
+                    team.class = "salvado";
+                }
+
+                // Inyección visual: desplazamiento y actualización de datos
+                const rowId = "row-" + team.name.replace(/\s+/g, '-');
+                const rowElement = document.getElementById(rowId);
+                
+                // Mueve físicamente la fila en el eje Y (50px por posición)
+                rowElement.style.transform = `translateY(${index * 50}px)`;
+                
+                // Actualiza los valores en tiempo real
+                rowElement.querySelector('.team-pts b').innerText = team.pts;
+                const statusDiv = rowElement.querySelector('.team-status');
+                statusDiv.innerText = team.status;
+                statusDiv.className = `team-status ${team.class}`;
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
