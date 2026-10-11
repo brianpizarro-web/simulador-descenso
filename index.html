@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulador Descenso Primera Nacional</title>
+    <title>Simulador Primera Nacional</title>
     <style>
         body { font-family: 'Roboto', system-ui, sans-serif; background-color: #f0f2f5; color: #333; padding: 20px; max-width: 900px; margin: auto; }
         h1 { text-align: center; font-size: 1.5rem; margin-bottom: 30px; color: #111; }
@@ -12,7 +12,8 @@
         .panel { flex: 1; min-width: 320px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #444; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
         
-        .panel-tabla { position: sticky; top: 20px; align-self: flex-start; padding: 0; background: transparent; box-shadow: none; }
+        /* Contenedor expandido forzosamente para evitar el colapso del ancho */
+        .panel-tabla { flex: 1; min-width: 320px; position: sticky; top: 20px; align-self: flex-start; padding: 0; background: transparent; box-shadow: none; }
 
         .fecha-grupo { margin-bottom: 10px; }
         .accordion-btn {
@@ -56,16 +57,15 @@
         .btn:hover { background: #e4e4e4; }
         .btn.active { background: #000; color: white; border-color: #000; }
 
-        /* ARQUITECTURA CORREGIDA: CSS GRID */
-        .tbody { position: relative; height: 336px; width: 100%; } /* 7 filas * 48px */
+        /* ARQUITECTURA REDUCIDA A 3 COLUMNAS */
+        .tbody { position: relative; height: 336px; width: 100%; } 
         .fila { 
             position: absolute; left: 0; right: 0; height: 48px; 
-            display: grid; grid-template-columns: 40px 35px 1fr 50px; /* Columnas estrictas */
+            display: grid; grid-template-columns: 45px 1fr 50px; 
             transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
             width: 100%;
         }
         
-        /* Formato de celdas internas */
         .fila > div {
             display: flex; align-items: center; justify-content: center;
             border-right: 2px solid #fff;
@@ -75,11 +75,9 @@
         .fila > div:last-child { border-right: none; }
         
         .team-pos { font-weight: bold; color: white; font-size: 1rem; }
-        .team-check { background-color: #ff5252; color: white; font-size: 0.9rem; }
         
-        /* Truncado de texto obligatorio para evitar que se rompa la altura */
         .team-name { 
-            display: block !important; /* Forza el bloque para truncar texto */
+            display: block !important; 
             line-height: 46px; 
             padding-left: 12px;
             text-align: left;
@@ -94,7 +92,6 @@
         
         .team-pts { font-weight: 800; font-size: 1.1rem; }
 
-        /* Zebra Striping y Colores */
         .fila.par.salvado .team-pos { background-color: #a0a0a0; }
         .fila.par.salvado .team-name, .fila.par.salvado .team-pts { background-color: #e0e0e0; color: #222; }
         
@@ -120,7 +117,6 @@
 
         <div class="panel-tabla">
             <div class="tbody" id="tabla-body">
-                <!-- Inyección DOM -->
             </div>
         </div>
     </div>
@@ -157,9 +153,9 @@
             Object.keys(basePts).forEach(team => {
                 const fila = document.createElement("div");
                 fila.id = "row-" + team.replace(/\s+/g, '-');
+                // Se eliminó la etiqueta del tick (team-check)
                 fila.innerHTML = `
                     <div class="team-pos"></div>
-                    <div class="team-check">✓</div>
                     <div class="team-name">${team}</div>
                     <div class="team-pts"></div>
                 `;
