@@ -5,24 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador Descenso Primera Nacional</title>
     <style>
-        body { font-family: system-ui, sans-serif; background-color: #121212; color: #ffffff; padding: 20px; max-width: 900px; margin: auto; }
-        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 30px; }
+        /* Transición a Light Mode profesional */
+        body { font-family: 'Roboto', system-ui, sans-serif; background-color: #f0f2f5; color: #333; padding: 20px; max-width: 900px; margin: auto; }
+        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 30px; color: #111; }
         
         .container { display: flex; flex-wrap: wrap; gap: 30px; position: relative; }
-        .panel { flex: 1; min-width: 320px; background: #1e1e1e; padding: 20px; border-radius: 8px; }
-        h3 { margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; color: #aaa; }
+        .panel { flex: 1; min-width: 320px; background: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        h3 { margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px; color: #444; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 1px; }
         
-        .panel-tabla { position: sticky; top: 20px; align-self: flex-start; }
+        .panel-tabla { position: sticky; top: 20px; align-self: flex-start; padding: 0; background: transparent; box-shadow: none; }
 
-        /* Diseño de Acordeones */
+        /* Acordeones limpios */
         .fecha-grupo { margin-bottom: 10px; }
         .accordion-btn {
-            background-color: #2a2a2a;
-            color: white;
+            background-color: #fff;
+            color: #333;
             cursor: pointer;
             padding: 12px 15px;
             width: 100%;
-            border: none;
+            border: 1px solid #ddd;
             text-align: left;
             outline: none;
             font-size: 1rem;
@@ -33,60 +34,82 @@
             align-items: center;
             transition: background-color 0.2s;
         }
-        .accordion-btn:hover { background-color: #333; }
+        .accordion-btn:hover { background-color: #f9f9f9; }
         .accordion-content {
-            padding: 5px 10px;
+            padding: 10px;
             display: none; 
-            background-color: #161616;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-top: none;
             border-radius: 0 0 4px 4px;
             margin-bottom: 10px;
         }
         .accordion-content.active { display: block; }
         
-        /* Ajuste UX para Localías */
-        .match { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; padding: 12px 0; border-bottom: 1px solid #2a2a2a; }
-        .match:last-child { border-bottom: none; }
+        /* Botonera de interacción */
+        .match { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+        .match:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .match-info { font-size: 0.95rem; text-align: center; display: flex; justify-content: space-between; padding: 0 5px; }
-        .team-local { font-weight: bold; text-align: left; flex: 1; }
-        .team-visitante { font-weight: bold; text-align: right; flex: 1; }
-        .vs { color: #666; font-size: 0.8rem; flex: 0.2; text-align: center; align-self: center; }
+        .team-local { font-weight: 700; text-align: left; flex: 1; }
+        .team-visitante { font-weight: 700; text-align: right; flex: 1; }
+        .vs { color: #aaa; font-size: 0.8rem; flex: 0.2; text-align: center; align-self: center; }
         
         .btn-group { display: flex; gap: 5px; width: 100%; }
-        .btn { flex: 1; background: #333; color: #fff; border: none; padding: 10px 0; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; font-size: 0.9rem; }
-        .btn:hover { background: #444; }
-        .btn.active { background: #007bff; color: white; }
+        .btn { flex: 1; background: #f0f0f0; color: #555; border: 1px solid #ccc; padding: 8px 0; border-radius: 4px; cursor: pointer; font-weight: bold; transition: all 0.2s; font-size: 0.85rem; }
+        .btn:hover { background: #e4e4e4; }
+        .btn.active { background: #000; color: white; border-color: #000; }
 
-        /* Tabla simplificada a 2 columnas */
-        .tabla-header { display: grid; grid-template-columns: 3fr 1fr; padding: 10px; border-bottom: 1px solid #555; font-weight: bold; font-size: 0.9rem; color: #aaa; }
-        .tabla-header div:last-child { text-align: right; }
+        /* Arquitectura Visual de Tabla Estilo Bloque */
+        .tbody { position: relative; height: 315px; } /* 7 filas * 45px altura */
+        .fila { 
+            position: absolute; left: 0; width: 100%; height: 45px; 
+            display: flex; align-items: stretch;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
         
-        .tbody { position: relative; height: 350px; margin-top: 10px; }
-        .fila { position: absolute; left: 0; width: 100%; height: 50px; display: grid; grid-template-columns: 3fr 1fr; align-items: center; padding: 0 10px; box-sizing: border-box; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s; border-bottom: 1px solid #2a2a2a; }
-        .team-pts { text-align: right; font-size: 1.1rem; }
-        .team-name { transition: color 0.3s; }
+        /* Celdas con bordes blancos de separación */
+        .fila > div {
+            display: flex; align-items: center; justify-content: center;
+            border-right: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            box-sizing: border-box;
+        }
+        .fila > div:last-child { border-right: none; }
         
-        /* Colores aplicados directamente al texto */
-        .salvado { color: #4CAF50; font-weight: bold; }
-        .desempate { color: #FFC107; font-weight: bold; }
-        .descendido { color: #F44336; font-weight: bold; }
+        .team-pos { width: 45px; font-weight: bold; color: white; font-size: 1rem; }
+        .team-check { width: 35px; background-color: #ff5252; color: white; font-size: 0.9rem; }
+        .team-name { flex: 1; justify-content: flex-start; padding-left: 12px; font-weight: 800; font-size: 0.95rem; text-transform: uppercase; letter-spacing: -0.5px; }
+        .team-pts { width: 60px; font-weight: 800; font-size: 1.1rem; }
+
+        /* Zebra Striping Dinámico para Zona Segura */
+        .fila.par.salvado .team-pos { background-color: #a0a0a0; }
+        .fila.par.salvado .team-name, .fila.par.salvado .team-pts { background-color: #e0e0e0; color: #222; }
+        
+        .fila.impar.salvado .team-pos { background-color: #b3b3b3; }
+        .fila.impar.salvado .team-name, .fila.impar.salvado .team-pts { background-color: #ececec; color: #222; }
+
+        /* Colorización Zona Desempate */
+        .fila.desempate .team-pos { background-color: #c99300; }
+        .fila.desempate .team-name, .fila.desempate .team-pts { background-color: #ffc107; color: #000; }
+        
+        /* Colorización Zona Descenso Directo */
+        .fila.descendido .team-pos { background-color: #d32f2f; }
+        .fila.descendido .team-name, .fila.descendido .team-pts { background-color: #ff7f7f; color: #000; }
+
     </style>
 </head>
 <body>
 
-    <h1>Simulador: Zona de Descenso</h1>
+    <h1>Simulador Primera Nacional</h1>
     
     <div class="container">
         <div class="panel" id="fixture-container">
             <h3>Fixture Restante</h3>
         </div>
 
-        <div class="panel panel-tabla">
-            <h3>Tabla de Posiciones</h3>
-            <div class="tabla-header">
-                <div>Equipo</div>
-                <div>Pts</div>
-            </div>
+        <div class="panel-tabla">
             <div class="tbody" id="tabla-body">
+                <!-- Inyección DOM -->
             </div>
         </div>
     </div>
@@ -95,24 +118,20 @@
         const basePts = { "Almagro": 41, "Agropecuario": 40, "Quilmes": 39, "Nueva Chicago": 36, "Patronato": 34, "Chacarita": 33, "Güemes": 23 };
         
         const matches = [
-            // Fecha 33
             { id: 1, l: "Güemes", v: "Patronato", f: "Fecha 33" },
             { id: 2, l: "Nueva Chicago", v: "Temperley", f: "Fecha 33" },
-            // Fecha 34
             { id: 3, l: "Almagro", v: "Güemes", f: "Fecha 34" },
             { id: 4, l: "Chacarita", v: "Deportivo Maipú", f: "Fecha 34" },
             { id: 5, l: "Patronato", v: "Tristán Suárez", f: "Fecha 34" },
             { id: 6, l: "Nueva Chicago", v: "Gimnasia (J)", f: "Fecha 34" },
             { id: 7, l: "Quilmes", v: "Atlético Rafaela", f: "Fecha 34" },
             { id: 8, l: "Agropecuario", v: "Colegiales", f: "Fecha 34" },
-            // Fecha 35
             { id: 9, l: "Deportivo Maipú", v: "Güemes", f: "Fecha 35" },
             { id: 10, l: "Temperley", v: "Chacarita", f: "Fecha 35" },
             { id: 11, l: "Patronato", v: "Agropecuario", f: "Fecha 35" },
             { id: 12, l: "San Martín (SJ)", v: "Nueva Chicago", f: "Fecha 35" },
             { id: 13, l: "San Martín (T)", v: "Quilmes", f: "Fecha 35" },
             { id: 14, l: "Tristán Suárez", v: "Almagro", f: "Fecha 35" },
-            // Fecha 36
             { id: 15, l: "Güemes", v: "Temperley", f: "Fecha 36" },
             { id: 16, l: "Nueva Chicago", v: "Chacarita", f: "Fecha 36" },
             { id: 17, l: "Atlético Rafaela", v: "Patronato", f: "Fecha 36" },
@@ -126,11 +145,13 @@
             const tbody = document.getElementById("tabla-body");
             Object.keys(basePts).forEach(team => {
                 const fila = document.createElement("div");
-                fila.className = "fila";
                 fila.id = "row-" + team.replace(/\s+/g, '-');
+                // Bloques idénticos al de la imagen
                 fila.innerHTML = `
+                    <div class="team-pos"></div>
+                    <div class="team-check">✓</div>
                     <div class="team-name">${team}</div>
-                    <div class="team-pts"><b>${basePts[team]}</b></div>
+                    <div class="team-pts"></div>
                 `;
                 tbody.appendChild(fila);
             });
@@ -228,12 +249,24 @@
                 const rowId = "row-" + team.name.replace(/\s+/g, '-');
                 const rowElement = document.getElementById(rowId);
                 
-                rowElement.style.transform = `translateY(${index * 50}px)`;
-                rowElement.querySelector('.team-pts b').innerText = team.pts;
+                rowElement.style.transform = `translateY(${index * 45}px)`;
                 
-                // Aplica el color directamente al nombre del equipo
-                const nameDiv = rowElement.querySelector('.team-name');
-                nameDiv.className = `team-name ${team.class}`;
+                // Formato numérico idéntico a la imagen (ej: "12.")
+                rowElement.querySelector('.team-pos').innerText = (index + 12) + ".";
+                rowElement.querySelector('.team-pts').innerText = team.pts;
+                
+                // Reset de clases para recalcular el zebra striping
+                rowElement.className = 'fila';
+                
+                // Asignación matemática de par/impar para mantener el patrón al reordenar
+                if (index % 2 === 0) {
+                    rowElement.classList.add('par');
+                } else {
+                    rowElement.classList.add('impar');
+                }
+                
+                // Aplicación del color final de la fila
+                rowElement.classList.add(team.class);
             });
         }
 
