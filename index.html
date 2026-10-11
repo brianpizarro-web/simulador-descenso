@@ -8,16 +8,46 @@
         body { font-family: system-ui, sans-serif; background-color: #121212; color: #ffffff; padding: 20px; max-width: 900px; margin: auto; }
         h1 { text-align: center; font-size: 1.5rem; margin-bottom: 30px; }
         
-        .container { display: flex; flex-wrap: wrap; gap: 30px; }
+        .container { display: flex; flex-wrap: wrap; gap: 30px; position: relative; }
         .panel { flex: 1; min-width: 320px; background: #1e1e1e; padding: 20px; border-radius: 8px; }
         h3 { margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; color: #aaa; }
         
-        .fecha-grupo { margin-bottom: 25px; }
-        .fecha-titulo { font-weight: bold; color: #fff; background: #2a2a2a; padding: 5px 10px; border-radius: 4px; margin-bottom: 10px; display: inline-block; font-size: 0.85rem; }
+        /* Regla para anclar la tabla al hacer scroll en escritorio */
+        .panel-tabla { position: sticky; top: 20px; align-self: flex-start; }
+
+        /* Diseño de Acordeones */
+        .fecha-grupo { margin-bottom: 10px; }
+        .accordion-btn {
+            background-color: #2a2a2a;
+            color: white;
+            cursor: pointer;
+            padding: 12px 15px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .accordion-btn:hover { background-color: #333; }
+        .accordion-content {
+            padding: 5px 10px;
+            display: none; /* Oculto por defecto */
+            background-color: #161616;
+            border-radius: 0 0 4px 4px;
+            margin-bottom: 10px;
+        }
+        .accordion-content.active { display: block; }
         
         /* Ajuste UX para Localías */
         .match { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; padding: 12px 0; border-bottom: 1px solid #2a2a2a; }
-        .match-info { font-size: 0.95rem; text-align: center; display: flex; justify-content: space-between; padding: 0 10px; }
+        .match:last-child { border-bottom: none; }
+        .match-info { font-size: 0.95rem; text-align: center; display: flex; justify-content: space-between; padding: 0 5px; }
         .team-local { font-weight: bold; text-align: left; flex: 1; }
         .team-visitante { font-weight: bold; text-align: right; flex: 1; }
         .vs { color: #666; font-size: 0.8rem; flex: 0.2; text-align: center; align-self: center; }
@@ -45,7 +75,7 @@
             <h3>Fixture Restante</h3>
         </div>
 
-        <div class="panel">
+        <div class="panel panel-tabla">
             <h3>Tabla de Posiciones</h3>
             <div class="tabla-header">
                 <div>Equipo</div>
@@ -60,11 +90,6 @@
     <script>
         const basePts = { "Almagro": 41, "Agropecuario": 40, "Quilmes": 39, "Nueva Chicago": 36, "Patronato": 34, "Chacarita": 33, "Güemes": 23 };
         
-        /* 
-           Se inyectaron los rivales reales. 
-           Nota: Asumí la localía basándome en el orden estándar de tu lista. 
-           Si en la realidad Chacarita es visitante contra D. Maipú, solo debes invertir los nombres aquí. 
-        */
         const matches = [
             // Fecha 33
             { id: 1, l: "Güemes", v: "Patronato", f: "Fecha 33" },
@@ -110,11 +135,28 @@
             const container = document.getElementById("fixture-container");
             const fechas = [...new Set(matches.map(m => m.f))];
             
-            fechas.forEach(fecha => {
+            fechas.forEach((fecha, index) => {
                 const grupo = document.createElement("div");
                 grupo.className = "fecha-grupo";
-                grupo.innerHTML = `<div class="fecha-titulo">${fecha}</div>`;
                 
+                // Botón del acordeón
+                const btn = document.createElement("button");
+                btn.className = "accordion-btn";
+                // Flecha indicadora de si está abierto o cerrado
+                btn.innerHTML = `${fecha} <span>${index === 0 ? '▲' : '▼'}</span>`;
+                
+                // Contenedor de partidos
+                const content = document.createElement("div");
+                content.className = "accordion-content";
+                if (index === 0) content.classList.add("active"); // Abre solo la primera fecha
+                
+                // Lógica de apertura/cierre
+                btn.onclick = function() {
+                    const isActive = content.classList.contains("active");
+                    content.classList.toggle("active");
+                    this.innerHTML = `${fecha} <span>${isActive ? '▼' : '▲'}</span>`;
+                };
+
                 matches.filter(m => m.f === fecha).forEach(m => {
                     results[m.id] = "pend";
                     const matchDiv = document.createElement("div");
@@ -132,8 +174,11 @@
                             <button class="btn" data-val="V" onclick="update(${m.id}, 'V')">Visita</button>
                         </div>
                     `;
-                    grupo.appendChild(matchDiv);
+                    content.appendChild(matchDiv);
                 });
+                
+                grupo.appendChild(btn);
+                grupo.appendChild(content);
                 container.appendChild(grupo);
             });
 
