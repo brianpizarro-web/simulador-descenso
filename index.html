@@ -12,24 +12,25 @@
         .panel { flex: 1; min-width: 320px; background: #1e1e1e; padding: 20px; border-radius: 8px; }
         h3 { margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; color: #aaa; }
         
-        /* Sistema Fecha por Fecha */
         .fecha-grupo { margin-bottom: 25px; }
         .fecha-titulo { font-weight: bold; color: #fff; background: #2a2a2a; padding: 5px 10px; border-radius: 4px; margin-bottom: 10px; display: inline-block; font-size: 0.85rem; }
         
-        /* Botonera un clic */
-        .match { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 8px 0; border-bottom: 1px solid #2a2a2a; }
-        .match-info { font-size: 0.9rem; flex: 1; }
-        .btn-group { display: flex; gap: 5px; }
-        .btn { background: #333; color: #fff; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; min-width: 40px; }
+        /* Ajuste UX para Localías */
+        .match { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; padding: 12px 0; border-bottom: 1px solid #2a2a2a; }
+        .match-info { font-size: 0.95rem; text-align: center; display: flex; justify-content: space-between; padding: 0 10px; }
+        .team-local { font-weight: bold; text-align: left; flex: 1; }
+        .team-visitante { font-weight: bold; text-align: right; flex: 1; }
+        .vs { color: #666; font-size: 0.8rem; flex: 0.2; text-align: center; align-self: center; }
+        
+        .btn-group { display: flex; gap: 5px; width: 100%; }
+        .btn { flex: 1; background: #333; color: #fff; border: none; padding: 10px 0; border-radius: 4px; cursor: pointer; font-weight: bold; transition: background 0.2s; font-size: 0.9rem; }
         .btn:hover { background: #444; }
         .btn.active { background: #007bff; color: white; }
 
-        /* Tabla Animada (Coordenadas Absolutas) */
         .tabla-header { display: grid; grid-template-columns: 2fr 1fr 2fr; padding: 10px; border-bottom: 1px solid #555; font-weight: bold; font-size: 0.9rem; color: #aaa; }
-        .tbody { position: relative; height: 350px; /* 7 filas * 50px */ margin-top: 10px; }
+        .tbody { position: relative; height: 350px; margin-top: 10px; }
         .fila { position: absolute; left: 0; width: 100%; height: 50px; display: grid; grid-template-columns: 2fr 1fr 2fr; align-items: center; padding: 0 10px; box-sizing: border-box; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s; border-bottom: 1px solid #2a2a2a; }
         
-        /* Estados del reglamento */
         .salvado { color: #4CAF50; font-weight: bold; }
         .desempate { color: #FFC107; font-weight: bold; }
         .descendido { color: #F44336; font-weight: bold; }
@@ -42,7 +43,6 @@
     <div class="container">
         <div class="panel" id="fixture-container">
             <h3>Fixture Restante</h3>
-            <!-- Partidos agrupados por fecha generados por JS -->
         </div>
 
         <div class="panel">
@@ -53,7 +53,6 @@
                 <div>Estado</div>
             </div>
             <div class="tbody" id="tabla-body">
-                <!-- Filas creadas dinámicamente para animación -->
             </div>
         </div>
     </div>
@@ -61,32 +60,40 @@
     <script>
         const basePts = { "Almagro": 41, "Agropecuario": 40, "Quilmes": 39, "Nueva Chicago": 36, "Patronato": 34, "Chacarita": 33, "Güemes": 23 };
         
+        /* 
+           Se inyectaron los rivales reales. 
+           Nota: Asumí la localía basándome en el orden estándar de tu lista. 
+           Si en la realidad Chacarita es visitante contra D. Maipú, solo debes invertir los nombres aquí. 
+        */
         const matches = [
+            // Fecha 33
             { id: 1, l: "Güemes", v: "Patronato", f: "Fecha 33" },
-            { id: 2, l: "Nueva Chicago", v: "Externo", f: "Fecha 33" },
+            { id: 2, l: "Nueva Chicago", v: "Temperley", f: "Fecha 33" },
+            // Fecha 34
             { id: 3, l: "Almagro", v: "Güemes", f: "Fecha 34" },
-            { id: 4, l: "Chacarita", v: "Externo", f: "Fecha 34" },
-            { id: 5, l: "Patronato", v: "Externo", f: "Fecha 34" },
-            { id: 6, l: "Nueva Chicago", v: "Externo", f: "Fecha 34" },
-            { id: 7, l: "Quilmes", v: "Externo", f: "Fecha 34" },
-            { id: 8, l: "Agropecuario", v: "Externo", f: "Fecha 34" },
-            { id: 9, l: "Güemes", v: "Externo", f: "Fecha 35" },
-            { id: 10, l: "Chacarita", v: "Externo", f: "Fecha 35" },
+            { id: 4, l: "Chacarita", v: "Deportivo Maipú", f: "Fecha 34" },
+            { id: 5, l: "Patronato", v: "Tristán Suárez", f: "Fecha 34" },
+            { id: 6, l: "Nueva Chicago", v: "Gimnasia (J)", f: "Fecha 34" },
+            { id: 7, l: "Quilmes", v: "Atlético Rafaela", f: "Fecha 34" },
+            { id: 8, l: "Agropecuario", v: "Colegiales", f: "Fecha 34" },
+            // Fecha 35
+            { id: 9, l: "Deportivo Maipú", v: "Güemes", f: "Fecha 35" },
+            { id: 10, l: "Temperley", v: "Chacarita", f: "Fecha 35" },
             { id: 11, l: "Patronato", v: "Agropecuario", f: "Fecha 35" },
-            { id: 12, l: "Nueva Chicago", v: "Externo", f: "Fecha 35" },
-            { id: 13, l: "Quilmes", v: "Externo", f: "Fecha 35" },
-            { id: 14, l: "Almagro", v: "Externo", f: "Fecha 35" },
-            { id: 15, l: "Güemes", v: "Externo", f: "Fecha 36" },
-            { id: 16, l: "Chacarita", v: "Nueva Chicago", f: "Fecha 36" },
-            { id: 17, l: "Patronato", v: "Externo", f: "Fecha 36" },
-            { id: 18, l: "Quilmes", v: "Externo", f: "Fecha 36" },
+            { id: 12, l: "San Martín (SJ)", v: "Nueva Chicago", f: "Fecha 35" },
+            { id: 13, l: "San Martín (T)", v: "Quilmes", f: "Fecha 35" },
+            { id: 14, l: "Tristán Suárez", v: "Almagro", f: "Fecha 35" },
+            // Fecha 36
+            { id: 15, l: "Güemes", v: "Temperley", f: "Fecha 36" },
+            { id: 16, l: "Nueva Chicago", v: "Chacarita", f: "Fecha 36" },
+            { id: 17, l: "Atlético Rafaela", v: "Patronato", f: "Fecha 36" },
+            { id: 18, l: "Quilmes", v: "Gimnasia y Tiro", f: "Fecha 36" },
             { id: 19, l: "Almagro", v: "Agropecuario", f: "Fecha 36" }
         ];
 
         let results = {};
 
         function init() {
-            // Inicializar base de datos local y tabla DOM
             const tbody = document.getElementById("tabla-body");
             Object.keys(basePts).forEach(team => {
                 const fila = document.createElement("div");
@@ -100,7 +107,6 @@
                 tbody.appendChild(fila);
             });
 
-            // Agrupar fixture por fecha
             const container = document.getElementById("fixture-container");
             const fechas = [...new Set(matches.map(m => m.f))];
             
@@ -115,11 +121,15 @@
                     matchDiv.className = "match";
                     matchDiv.dataset.id = m.id;
                     matchDiv.innerHTML = `
-                        <div class="match-info">${m.l} vs ${m.v}</div>
+                        <div class="match-info">
+                            <span class="team-local">${m.l}</span>
+                            <span class="vs">vs</span>
+                            <span class="team-visitante">${m.v}</span>
+                        </div>
                         <div class="btn-group">
-                            <button class="btn" data-val="L" onclick="update(${m.id}, 'L')">L</button>
-                            <button class="btn" data-val="E" onclick="update(${m.id}, 'E')">E</button>
-                            <button class="btn" data-val="V" onclick="update(${m.id}, 'V')">V</button>
+                            <button class="btn" data-val="L" onclick="update(${m.id}, 'L')">Local</button>
+                            <button class="btn" data-val="E" onclick="update(${m.id}, 'E')">Empate</button>
+                            <button class="btn" data-val="V" onclick="update(${m.id}, 'V')">Visita</button>
                         </div>
                     `;
                     grupo.appendChild(matchDiv);
@@ -132,19 +142,15 @@
 
         function update(id, val) {
             results[id] = val;
-            
-            // Lógica de interfaz: actualizar estado activo del botón
             const matchRow = document.querySelector(`.match[data-id='${id}']`);
             matchRow.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
             matchRow.querySelector(`.btn[data-val='${val}']`).classList.add('active');
-            
             calculate();
         }
 
         function calculate() {
             let currentPts = { ...basePts };
 
-            // Cálculo matemático de los cruces
             matches.forEach(m => {
                 const res = results[m.id];
                 if (res === "L") {
@@ -157,11 +163,9 @@
                 }
             });
 
-            // Generar matriz de posiciones temporales
             let table = Object.keys(currentPts).map(k => ({ name: k, pts: currentPts[k] }));
             table.sort((a, b) => b.pts - a.pts);
 
-            // Algoritmo de desempate ternario
             table.forEach((team, index) => {
                 let samePts = table.filter(t => t.pts === team.pts).length;
                 let teamsBelow = table.filter(t => t.pts < team.pts).length;
@@ -180,14 +184,9 @@
                     team.class = "salvado";
                 }
 
-                // Inyección visual: desplazamiento y actualización de datos
                 const rowId = "row-" + team.name.replace(/\s+/g, '-');
                 const rowElement = document.getElementById(rowId);
-                
-                // Mueve físicamente la fila en el eje Y (50px por posición)
                 rowElement.style.transform = `translateY(${index * 50}px)`;
-                
-                // Actualiza los valores en tiempo real
                 rowElement.querySelector('.team-pts b').innerText = team.pts;
                 const statusDiv = rowElement.querySelector('.team-status');
                 statusDiv.innerText = team.status;
