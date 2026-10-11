@@ -12,7 +12,6 @@
         .panel { flex: 1; min-width: 320px; background: #1e1e1e; padding: 20px; border-radius: 8px; }
         h3 { margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px; color: #aaa; }
         
-        /* Regla para anclar la tabla al hacer scroll en escritorio */
         .panel-tabla { position: sticky; top: 20px; align-self: flex-start; }
 
         /* Diseño de Acordeones */
@@ -37,7 +36,7 @@
         .accordion-btn:hover { background-color: #333; }
         .accordion-content {
             padding: 5px 10px;
-            display: none; /* Oculto por defecto */
+            display: none; 
             background-color: #161616;
             border-radius: 0 0 4px 4px;
             margin-bottom: 10px;
@@ -57,10 +56,16 @@
         .btn:hover { background: #444; }
         .btn.active { background: #007bff; color: white; }
 
-        .tabla-header { display: grid; grid-template-columns: 2fr 1fr 2fr; padding: 10px; border-bottom: 1px solid #555; font-weight: bold; font-size: 0.9rem; color: #aaa; }
-        .tbody { position: relative; height: 350px; margin-top: 10px; }
-        .fila { position: absolute; left: 0; width: 100%; height: 50px; display: grid; grid-template-columns: 2fr 1fr 2fr; align-items: center; padding: 0 10px; box-sizing: border-box; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s; border-bottom: 1px solid #2a2a2a; }
+        /* Tabla simplificada a 2 columnas */
+        .tabla-header { display: grid; grid-template-columns: 3fr 1fr; padding: 10px; border-bottom: 1px solid #555; font-weight: bold; font-size: 0.9rem; color: #aaa; }
+        .tabla-header div:last-child { text-align: right; }
         
+        .tbody { position: relative; height: 350px; margin-top: 10px; }
+        .fila { position: absolute; left: 0; width: 100%; height: 50px; display: grid; grid-template-columns: 3fr 1fr; align-items: center; padding: 0 10px; box-sizing: border-box; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s; border-bottom: 1px solid #2a2a2a; }
+        .team-pts { text-align: right; font-size: 1.1rem; }
+        .team-name { transition: color 0.3s; }
+        
+        /* Colores aplicados directamente al texto */
         .salvado { color: #4CAF50; font-weight: bold; }
         .desempate { color: #FFC107; font-weight: bold; }
         .descendido { color: #F44336; font-weight: bold; }
@@ -80,7 +85,6 @@
             <div class="tabla-header">
                 <div>Equipo</div>
                 <div>Pts</div>
-                <div>Estado</div>
             </div>
             <div class="tbody" id="tabla-body">
             </div>
@@ -127,7 +131,6 @@
                 fila.innerHTML = `
                     <div class="team-name">${team}</div>
                     <div class="team-pts"><b>${basePts[team]}</b></div>
-                    <div class="team-status"></div>
                 `;
                 tbody.appendChild(fila);
             });
@@ -139,18 +142,14 @@
                 const grupo = document.createElement("div");
                 grupo.className = "fecha-grupo";
                 
-                // Botón del acordeón
                 const btn = document.createElement("button");
                 btn.className = "accordion-btn";
-                // Flecha indicadora de si está abierto o cerrado
                 btn.innerHTML = `${fecha} <span>${index === 0 ? '▲' : '▼'}</span>`;
                 
-                // Contenedor de partidos
                 const content = document.createElement("div");
                 content.className = "accordion-content";
-                if (index === 0) content.classList.add("active"); // Abre solo la primera fecha
+                if (index === 0) content.classList.add("active");
                 
-                // Lógica de apertura/cierre
                 btn.onclick = function() {
                     const isActive = content.classList.contains("active");
                     content.classList.toggle("active");
@@ -219,23 +218,22 @@
                 let mejorPosicion = 8 - (teamsBelow + samePts);
                 
                 if (mejorPosicion <= 5 && peorPosicion >= 6) {
-                    team.status = "Desempate";
                     team.class = "desempate";
                 } else if (mejorPosicion >= 6) {
-                    team.status = "Descenso Directo";
                     team.class = "descendido";
                 } else {
-                    team.status = "Salvado";
                     team.class = "salvado";
                 }
 
                 const rowId = "row-" + team.name.replace(/\s+/g, '-');
                 const rowElement = document.getElementById(rowId);
+                
                 rowElement.style.transform = `translateY(${index * 50}px)`;
                 rowElement.querySelector('.team-pts b').innerText = team.pts;
-                const statusDiv = rowElement.querySelector('.team-status');
-                statusDiv.innerText = team.status;
-                statusDiv.className = `team-status ${team.class}`;
+                
+                // Aplica el color directamente al nombre del equipo
+                const nameDiv = rowElement.querySelector('.team-name');
+                nameDiv.className = `team-name ${team.class}`;
             });
         }
 
