@@ -44,6 +44,10 @@
         .btn:hover { background: #e4e4e4; }
         .btn.active { background: #000; color: white; border-color: #000; }
 
+        /* Bloque de Partido Finalizado */
+        .match-result { background-color: #f8f9fa; color: #666; text-align: center; padding: 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; border: 1px solid #e2e2e2; margin-top: 5px; letter-spacing: 1px; }
+        .match-result span { display: block; font-size: 1.3rem; color: #111; margin-top: 4px; letter-spacing: 2px; }
+
         /* Estructura de Tabla */
         .tbody { position: relative; height: 336px; width: 100%; } 
         .fila { position: absolute; left: 0; right: 0; height: 48px; display: grid; grid-template-columns: 45px 1fr 50px; transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1); width: 100%; }
@@ -135,13 +139,13 @@
             }
         }
 
-        const basePts = { "Almagro": 41, "Agropecuario": 40, "Quilmes": 39, "Nueva Chicago": 36, "Patronato": 34, "Chacarita": 33, "Güemes": 23 };
+        // Se han sumado empíricamente los 3 puntos ganados por Patronato
+        const basePts = { "Almagro": 41, "Agropecuario": 40, "Quilmes": 39, "Patronato": 37, "Nueva Chicago": 36, "Chacarita": 33, "Güemes": 23 };
         
-        // Matriz cronológicamente ordenada
         const matches = [
-            // Fecha 33
-            { id: 1, l: "Güemes", v: "Patronato", f: "Fecha 33", d: "Domingo 11/10, 16:00hs" },
-            { id: 2, l: "Nueva Chicago", v: "Temperley", f: "Fecha 33", d: "Domingo 11/10, 16:00hs" },
+            // Fecha 33 - Partidos finalizados (Inyección de variable "r")
+            { id: 1, l: "Güemes", v: "Patronato", f: "Fecha 33", d: "Domingo 11/10, 16:00hs", r: "0 - 2" },
+            { id: 2, l: "Nueva Chicago", v: "Temperley", f: "Fecha 33", d: "Domingo 11/10, 16:00hs", r: "1 - 2" },
             
             // Fecha 34
             { id: 3, l: "Quilmes", v: "Atlético Rafaela", f: "Fecha 34", d: "Viernes 16/10, 21:00hs" },
@@ -207,6 +211,20 @@
                     const matchDiv = document.createElement("div");
                     matchDiv.className = "match";
                     matchDiv.dataset.id = m.id;
+                    
+                    // Condicional para inyectar resultado final o botonera interactiva
+                    let interactionHTML = "";
+                    if (m.r) {
+                        interactionHTML = `<div class="match-result">FINALIZADO <span>${m.r}</span></div>`;
+                    } else {
+                        interactionHTML = `
+                        <div class="btn-group">
+                            <button class="btn" data-val="L" onclick="update(${m.id}, 'L')">Local</button>
+                            <button class="btn" data-val="E" onclick="update(${m.id}, 'E')">Empate</button>
+                            <button class="btn" data-val="V" onclick="update(${m.id}, 'V')">Visita</button>
+                        </div>`;
+                    }
+
                     matchDiv.innerHTML = `
                         <div class="match-time">${m.d}</div>
                         <div class="match-info">
@@ -214,11 +232,7 @@
                             <span class="vs">vs</span>
                             <span class="team-visitante">${m.v}</span>
                         </div>
-                        <div class="btn-group">
-                            <button class="btn" data-val="L" onclick="update(${m.id}, 'L')">Local</button>
-                            <button class="btn" data-val="E" onclick="update(${m.id}, 'E')">Empate</button>
-                            <button class="btn" data-val="V" onclick="update(${m.id}, 'V')">Visita</button>
-                        </div>
+                        ${interactionHTML}
                     `;
                     content.appendChild(matchDiv);
                 });
@@ -248,14 +262,17 @@
             let currentPts = { ...basePts };
 
             matches.forEach(m => {
-                const res = results[m.id];
-                if (res === "L") {
-                    if(currentPts[m.l] !== undefined) currentPts[m.l] += 3;
-                } else if (res === "E") {
-                    if(currentPts[m.l] !== undefined) currentPts[m.l] += 1;
-                    if(currentPts[m.v] !== undefined) currentPts[m.v] += 1;
-                } else if (res === "V") {
-                    if(currentPts[m.v] !== undefined) currentPts[m.v] += 3;
+                // Solo se calculan interacciones si el partido no está finalizado
+                if(!m.r) {
+                    const res = results[m.id];
+                    if (res === "L") {
+                        if(currentPts[m.l] !== undefined) currentPts[m.l] += 3;
+                    } else if (res === "E") {
+                        if(currentPts[m.l] !== undefined) currentPts[m.l] += 1;
+                        if(currentPts[m.v] !== undefined) currentPts[m.v] += 1;
+                    } else if (res === "V") {
+                        if(currentPts[m.v] !== undefined) currentPts[m.v] += 3;
+                    }
                 }
             });
 
