@@ -139,36 +139,35 @@
             }
         }
 
-        // Se han sumado empíricamente los 3 puntos ganados por Patronato
         const basePts = { "Almagro": 41, "Agropecuario": 40, "Quilmes": 39, "Patronato": 37, "Nueva Chicago": 36, "Chacarita": 33, "Güemes": 23 };
         
         const matches = [
-            // Fecha 33 - Partidos finalizados (Inyección de variable "r")
-            { id: 1, l: "Güemes", v: "Patronato", f: "Fecha 33", d: "Domingo 11/10, 16:00hs", r: "0 - 2" },
-            { id: 2, l: "Nueva Chicago", v: "Temperley", f: "Fecha 33", d: "Domingo 11/10, 16:00hs", r: "1 - 2" },
+            // Fecha 33
+            { id: 1, l: "Patronato", v: "Güemes", f: "Fecha 33", d: "Domingo 11/10, 16:00hs", r: "2 - 0" },
+            { id: 2, l: "Temperley", v: "Nueva Chicago", f: "Fecha 33", d: "Domingo 11/10, 16:00hs", r: "2 - 1" },
             
             // Fecha 34
-            { id: 3, l: "Quilmes", v: "Atlético Rafaela", f: "Fecha 34", d: "Viernes 16/10, 21:00hs" },
+            { id: 3, l: "Atlético Rafaela", v: "Quilmes", f: "Fecha 34", d: "Viernes 16/10, 21:00hs" },
             { id: 4, l: "Chacarita", v: "Deportivo Maipú", f: "Fecha 34", d: "Sábado 17/10, 15:00hs" },
-            { id: 5, l: "Patronato", v: "Tristán Suárez", f: "Fecha 34", d: "Sábado 17/10, 15:00hs" },
+            { id: 5, l: "Tristán Suárez", v: "Patronato", f: "Fecha 34", d: "Sábado 17/10, 15:00hs" },
             { id: 6, l: "Agropecuario", v: "Colegiales", f: "Fecha 34", d: "Sábado 17/10, 15:00hs" },
             { id: 7, l: "Nueva Chicago", v: "Gimnasia (J)", f: "Fecha 34", d: "Domingo 18/10, 15:30hs" },
-            { id: 8, l: "Almagro", v: "Güemes", f: "Fecha 34", d: "Domingo 18/10, 17:00hs" },
+            { id: 8, l: "Güemes", v: "Almagro", f: "Fecha 34", d: "Domingo 18/10, 17:00hs" },
             
             // Fecha 35
             { id: 9, l: "Deportivo Maipú", v: "Güemes", f: "Fecha 35", d: "A confirmar" },
             { id: 10, l: "Temperley", v: "Chacarita", f: "Fecha 35", d: "A confirmar" },
             { id: 11, l: "Patronato", v: "Agropecuario", f: "Fecha 35", d: "A confirmar" },
-            { id: 12, l: "San Martín (SJ)", v: "Nueva Chicago", f: "Fecha 35", d: "A confirmar" },
-            { id: 13, l: "San Martín (T)", v: "Quilmes", f: "Fecha 35", d: "A confirmar" },
-            { id: 14, l: "Tristán Suárez", v: "Almagro", f: "Fecha 35", d: "A confirmar" },
+            { id: 12, l: "Nueva Chicago", v: "San Martín (SJ)", f: "Fecha 35", d: "A confirmar" },
+            { id: 13, l: "Quilmes", v: "San Martín (T)", f: "Fecha 35", d: "A confirmar" },
+            { id: 14, l: "Almagro", v: "Tristán Suárez", f: "Fecha 35", d: "A confirmar" },
             
             // Fecha 36
             { id: 15, l: "Güemes", v: "Temperley", f: "Fecha 36", d: "A confirmar" },
-            { id: 16, l: "Nueva Chicago", v: "Chacarita", f: "Fecha 36", d: "A confirmar" },
+            { id: 16, l: "Chacarita", v: "Nueva Chicago", f: "Fecha 36", d: "A confirmar" },
             { id: 17, l: "Atlético Rafaela", v: "Patronato", f: "Fecha 36", d: "A confirmar" },
-            { id: 18, l: "Quilmes", v: "Gimnasia y Tiro", f: "Fecha 36", d: "A confirmar" },
-            { id: 19, l: "Almagro", v: "Agropecuario", f: "Fecha 36", d: "A confirmar" }
+            { id: 18, l: "Gimnasia y Tiro", v: "Quilmes", f: "Fecha 36", d: "A confirmar" },
+            { id: 19, l: "Agropecuario", v: "Almagro", f: "Fecha 36", d: "A confirmar" }
         ];
 
         let results = {};
@@ -212,7 +211,6 @@
                     matchDiv.className = "match";
                     matchDiv.dataset.id = m.id;
                     
-                    // Condicional para inyectar resultado final o botonera interactiva
                     let interactionHTML = "";
                     if (m.r) {
                         interactionHTML = `<div class="match-result">FINALIZADO <span>${m.r}</span></div>`;
@@ -262,7 +260,6 @@
             let currentPts = { ...basePts };
 
             matches.forEach(m => {
-                // Solo se calculan interacciones si el partido no está finalizado
                 if(!m.r) {
                     const res = results[m.id];
                     if (res === "L") {
